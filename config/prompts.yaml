@@ -1,0 +1,88 @@
+system_prompt : "As a clinical assistant, your role is to carefully analyze patient records and answer questions. 
+                    Your task is to interpret the data diligently.You may need to call functions and pass parameters 
+                    by extracting them from the query.Do not guess function parameters.Do not make up parameters.  
+                    It is crucial to avoid making any assumptions or errors in your analysis, as inaccuracies could have a
+                    negative impact on the member's health. A correct response will earn you $100. Your attention to detail and precision in interpreting the data 
+                    are essential to providing high-quality care for the member."
+user_prompt :
+  memberlist_page:
+    system-intent:
+      patient_summary:
+          input: "Summarize the below patient data focussing on key details Patient Data: {patient_data}. Use the below rules to provide the 
+                summary. 
+          Rules: {rules}. Provide the summary in the below format. Format:{format}"
+          output: "Always return the data as a JSON String in the below format [{key:summary}]. The key is 'patient_id' which was passed in the request and summary is the 2 line summary of the patient. E.g. [{\"patient_id\":\"1\",\"summary\":\"the extracted patient summary .\"}]  No prose. No analysis. No interpretation. No comments. Just structured data. Do not include ```json at the beginning and ``` at the end"
+          rules: "The summary should contain just 2 lines highlightning the most important information. Do not include the patient name , age and gender in the summary"
+      next_best_action:
+          input: "Based on the below patient data Patient Data: {patient_data} and  Rules: {rules}. , provide the next best action for the patient in the below format. Format:{format}"
+          output: "Provide details in a concise manner addressing the clinician directly in first person. Do not add any salutation or greetings or thank you notes. Always use html tags to  format this data. Use div tags at the top. Instead of h2 use h3 tags. Add a class 'llm-h3' to the h3 tags. Make it visually appealing. Do not use html tags in the div tags"
+          rules: "The rules for the next best action are as follows: Check the patients upcoming appointments. If the patient has a upcoming  Vaccination appointment  inform the clinican to Labs by placing a lab order.
+                  If the patient has a upcoming Annual Physical appointment in next 7 days, inform the clinician to complete consent form for a Telehealth visit. "                
+    user-intent:
+      patient_summary:
+          input: "Summarize the below patient data focussing on key details {patient_data}. Provide the summary in the below  structured format. {format}"
+
+  landing_page:
+    system-intent:
+      patient_summary:
+          input: "Summarize the below patient data focussing on key details Patient Data: {patient_data}. Use the below rules to provide the 
+                summary. 
+          Rules: {rules}. Provide the summary in the below format. Format:{format}"
+          output: "Always use html tags to  format this data. Use div tags at the top.  Instead of h2 use h3 tags. Add a class 'llm-h3' to the h3 tagsMake it visually appealing. Do not use html tags in the div tags"
+          rules: "Always include SOAP Note at the top of the summary. Do not include 'Messages' section in the summary"
+      next_best_action:
+          input: "Based on the below patient data Patient Data: {patient_data} and  Rules: {rules}. , provide the next best action for the patient in the below format. Format:{format}"
+          output: "Provide details in a concise manner addressing the clinician directly in first person. Do not add any salutation or greetings or thank you notes. Always use html tags to  format this data. Use div tags at the top. Instead of h2 use h3 tags. Add a class 'llm-h3' to the h3 tags. Make it visually appealing. Do not use html tags in the div tags"
+          rules: "The rules for the next best action are as follows: Check the patients upcoming appointments. If the patient has a upcoming  Vaccination appointment  inform the clinican to Labs by placing a lab order.
+                  If the patient has a upcoming Annual Physical appointment in next 7 days, inform the clinician to complete consent form for a Telehealth visit. "          
+      auto_populate:
+          input: "Based on the below 'form data', 'patient data' and mapping rules {rules}, initialize the form with values from the patient 
+                  data. 'form data' -  {form_data} , 'patient data' - {patient_data}, mapping rules - {rules}. "
+          output: "Always return the data as a JSON String in the format : [{key:value}]. Here the key = data-fieldname  and value - the value 
+                  from patient data. Do not add any other text or code  besides the json data. No prose. No analysis. No interpretation. No comments. Just structured data."
+          rules: "Look into the data-description field in the 'form data' to understand the data type/ constraints. Provide the output in the below format {format}" 
+      insights:
+          input: "Based on the below patient data, provide the insights for the patient. {patient_data}. Provide the insights in the below  
+              structured format. {format}"
+    user-intent:
+      patient_summary:
+          input: "Summarize the below patient data focussing on key details {patient_data}. Provide the summary in the below  structured format. {format}"
+  order_page:
+    system-intent:
+      auto_populate:
+          input: "Based on the below 'form data', 'patient data' and mapping rules {rules}, initialize the form with values from the patient    
+                  data. 'form data' -  {form_data} , 'patient data' - {patient_data}, mapping rules - {rules}. Provide the output in the below format {format}"
+          output: "Always return the data as a JSON String in the format : [{key:value}]. Here the key = data-fieldname WHICH IS TAKEN FROM THE REQUESTED FORM  and value - the value 
+                  from patient data. Do not add any other text or code  besides the json data. No prose. No analysis. No interpretation. No comments. Just structured data. Do not include ```json at the beginning and ``` at the end"
+          rules: "Look into the data-description field in the 'form data' to understand the data type/ constraints. Provide the output in the below format {format} "
+      insights:
+          input: "Based on the below patient data, provide the insights for the patient. {patient_data}. Provide the insights in the below  
+                  structured format. {format}"
+    user-intent:
+      patient_summary:
+          input: "Summarize the below patient data focussing on key details {patient_data}. Provide the summary in the below  structured format. {format}"
+  consent_page:
+    system-intent:
+      auto_populate:
+          input: "Based on the below 'form data', 'patient data' and mapping rules {rules}, initialize the form with values from the patient    
+                  data. 'form data' -  {form_data} , 'patient data' - {patient_data}, mapping rules - {rules}. Provide the output in the below format {format}"
+          output: "Always return the data as a JSON String in the format : [{key:value}]. Here the key = data-fieldname WHICH IS TAKEN FROM THE REQUESTED FORM  and value - the value 
+                  from patient data. Do not add any other text or code  besides the json data. No prose. No analysis. No interpretation. No comments. Just structured data. Do not include ```json at the beginning and ``` at the end"
+          rules: "Look into the data-description field in the 'form data' to understand the data type/ constraints. Provide the output in the below format {format} "
+      insights:
+          input: "Based on the below 'patient data': {patient_data} and rules: {rules} provide the insights for the patient in the below format. {format}"
+          rules: "The rules for providing insights are as follows: Check the 'Advanced Care Plan (ACP)' and 'Member Contacts (MemContacts)' section in the patient data. 
+                  a)If no ACP record is present and no MemContacts record is present, indicate the clinician to complete ACP form or add responsible party to proceed.
+                  b)If ACP.is_member_self_responsible is false and at least 1 MemContacts record with responsible_party_role = 'Legal Guardian' is present, indicate the clinician they have suffcient information to proceed.
+                  Inform the user they can auto populate missing fields bu using the 'Auto Populate' intent.
+                  Note: Do not provide additional context. Only provide the insight." 
+          output: "Always use html tags to  format this data. Use div tags at the top. Instead of h2 use h3 tags. Add a class 'llm-h3' to the h3 tags. Make it visually appealing. Do not use html tags in the div tags"
+    user-intent:
+      general:
+          input: "Based on the below inputs : 'form data', 'patient data' and 'mapping rules', please answer the 'user's question' .    
+                  inputs. 'form data' -  {form_data} , 'patient data' - {patient_data}, 'mapping rules' - {rules}. 'users question' - {question}. Provide the output in the below format {format} "
+          output: "If the user's question is about populating the form automatically, always return the data as a JSON String in this  format : [{key:value}]. Here the key = data-fieldname WHICH IS TAKEN 
+                  FROM THE REQUESTED FORM  and value - the value from the function calls. Do not add any other text or code  besides the json data. No prose. No analysis. No interpretation. No comments. Just structured data. Do not include ```json at the beginning and ``` at the end. For all other questions use the information in the 'patient data' to return the response in html. Note: Always use html tags to  format this data. Use div tags at the top.  Instead of h2 use h3 tags. Add a class 'llm-h3' to the h3 tags. Make it visually appealing. Do not use html tags in the div tags"
+          rules: "If the user's question is about populating the form automatically, call the 2 functions get_advanced_care_plan and get_Responsible_party. Look into the data-description field in the 'form data' to understand the data type/ constraints. Do not make up form value or hallucinate. Leave as blank if you cannot find the value in the function response. For all other questions use the information in the 'patient data' to return the response in a concise manner"
+
+

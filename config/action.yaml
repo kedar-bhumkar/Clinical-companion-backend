@@ -1,0 +1,47 @@
+memberlist_page:
+    system-intent:
+        functions: 
+          - get_All_patient_summary
+        options:
+            patient_summary: Patient Summary
+            next_best_action: Next Best Action                        
+    user-intent:
+        functions:
+          
+
+landing_page:
+    system-intent:
+        functions: 
+          - get_Patient_Summary
+        options:
+            patient_summary: Patient Summary
+            next_best_action: Next Best Action            
+            insights: Insights
+            voice_note: Voice Note
+    user-intent:
+         functions:
+
+order_page:
+    system-intent:
+        functions: 
+          - get_patient
+        options:            
+            next_best_action: Next Best Action
+            auto_populate: Auto Populate
+    user-intent:
+        functions:
+        - getPatientVitals
+        
+consent_page:
+    system-intent:
+        functions:           
+          - get_advanced_care_plan
+          - get_Responsible_party
+        options:            
+            auto_populate: Auto Populate
+            insights: Insights
+    user-intent:
+        functions:           
+          - get_advanced_care_plan
+          - get_Responsible_party 
+
