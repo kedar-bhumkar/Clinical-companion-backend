@@ -1,14 +1,12 @@
-
 from fastapi import FastAPI, Request
 import time
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from constants import *
-from service import *
-from pydantic_models import *
+from service import handlemessage, handle_config
+from pydantic_models import Message
 
 theResponse = {"hello"}
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -35,34 +33,22 @@ async def add_process_time_header(request: Request, call_next):
     print(f"Request took {process_time} secs to complete")
     return response
 
-
 @app.get("/")
-def doGet( request:Request):
-    return {"Hello"}
-
+def doGet(request: Request):
+    return {"Hello": "World"}
 
 @app.post("/chat")
-def doChat( request:Request, message:Message):    
-    print("Inside /acd")    
-    
-    print(f'prompt -  {message.entity}, mode - {message.message}')           
+async def doChat(request: Request, message: Message):
+    print("Inside /chat")
+    print(f'prompt - {message.entity}, mode - {message.message}')
 
-
-    response = handlemessage(message)
-    #response = handle_message(message)
-    response = {"llm_response": response}
-    print("response", response)
-    return response
-    
+    response = await handlemessage(message)
+    return {"llm_response": response}
 
 @app.post("/config")
-def doChat( request:Request, message:Message):    
-    print("Inside /config")    
-    
-    print(f'prompt -  {message.entity}, mode - {message.message}')           
-
+def doConfig(request: Request, message: Message):
+    print("Inside /config")
+    print(f'prompt - {message.entity}, mode - {message.message}')
 
     response = handle_config(message)
-    #response = handle_message(message)
-
     return {"llm_response": response}

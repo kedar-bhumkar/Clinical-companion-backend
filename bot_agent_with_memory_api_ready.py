@@ -12,6 +12,7 @@ from langchain.agents import AgentExecutor
 
 #from mock_patient_data import *
 from mock_data import *
+from dto import *
 import os
 
 
@@ -26,7 +27,10 @@ def chat( system_prompt, user_input, functions, model):
 
   
     llm = ChatOpenAI(model=model, temperature=0)
-    tools = [globals()[name] for name in functions if name in globals()]
+    if functions:
+        tools = [globals()[name] for name in functions if name in globals()]
+    else:
+        tools = []
 
 
     print("tools", tools)
@@ -40,11 +44,12 @@ def chat( system_prompt, user_input, functions, model):
             MessagesPlaceholder(variable_name=MEMORY_KEY),        
             ("user", "Question from the user : {input}."),
             MessagesPlaceholder(variable_name="agent_scratchpad"),
-        ]
+        ] 
     )
-
-    llm_with_tools = llm.bind_tools(tools)
-
+    if tools:
+        llm_with_tools = llm.bind_tools(tools)
+    else:
+        llm_with_tools = llm
 
     agent = (
         {

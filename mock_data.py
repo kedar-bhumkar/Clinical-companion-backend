@@ -179,7 +179,7 @@ def getSoapNoteData() -> Dict[str, Any]:
         "Fatigue": ["generalized", "sudden onset", "progressive", "with weakness"],
         "Nausea": ["with vomiting", "without vomiting", "intermittent", "persistent"],
         "Dizziness": ["vertigo", "lightheadedness", "with fainting", "positional"]
-    }
+    } 
     
     hpi_elements = {
         "onset": ["sudden", "gradual", "acute", "chronic", "intermittent"],

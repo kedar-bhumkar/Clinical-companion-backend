@@ -7,7 +7,7 @@ memberlist_page:
             next_best_action: Next Best Action                        
     user-intent:
         functions:
-          
+          - web_search
 
 landing_page:
     system-intent:
@@ -20,6 +20,7 @@ landing_page:
             voice_note: Voice Note
     user-intent:
          functions:
+          - web_search
 
 order_page:
     system-intent:
@@ -31,6 +32,7 @@ order_page:
     user-intent:
         functions:
         - getPatientVitals
+        - web_search
         
 consent_page:
     system-intent:
@@ -39,9 +41,10 @@ consent_page:
           - get_Responsible_party
         options:            
             auto_populate: Auto Populate
-            insights: Insights
+            insights: Insights            
     user-intent:
         functions:           
           - get_advanced_care_plan
           - get_Responsible_party 
+          - web_search
 

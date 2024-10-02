@@ -1,5 +1,6 @@
 from typing import List, Dict, Any
-
+import duckduckgo_search
+from langchain.agents import tool
 
 from mock_data import (
     getPatientVitals,
@@ -14,7 +15,7 @@ from mock_data import (
     getSoapNoteData,
     getPatientSummary,
     getAllPatientSummary    
-)
+)  
 
 def get_All_patient_summary(patient_ids: List[str]) -> Dict[str, Any]:
     return getAllPatientSummary(patient_ids)
@@ -51,4 +52,20 @@ def get_patient_messages(patient_id: str) -> List[Dict[str, Any]]:
 
 def get_soap_note_data() -> Dict[str, Any]:
     return getSoapNoteData()
+
+@tool
+def web_search(query: str) -> List[Dict[str, Any]]:
+    """
+    Perform a web search using DuckDuckGo based on the user's query.
+
+    Args:
+        query (str): The search query provided by the user.
+
+    Returns:
+        List[Dict[str, Any]]: A list of search results, where each result is a dictionary
+        containing information about the search result.
+    """
+    ddg = duckduckgo_search.DDGS()
+    results = list(ddg.text(query, max_results=5))
+    return results
 

@@ -3,48 +3,21 @@ from pydantic_models import *
 from util import *
 from dto import *
 import json
-from openai import  OpenAI
+from openai import OpenAI
 import re
 import yaml
 from mock_data import *
-from dto import *
 from typing import Dict, Any
 from bot_agent_with_memory_api_ready import chat
 from shared import shared_data_instance
+import aiohttp
 
-prompt_config = any
-action_config = any
-def handle_message(message:Message):    
-    
-    return  {"response": {"html": summary}}
+prompt_config = {}
+action_config = {}
 
-
-def handle_config(message: Message) -> Dict[str, Any]:
-    print("Inside handle_config")
-    print('message', message)
-
-    # Read the action.yaml file
-    with open('config/action.yaml', 'r') as file:
-        prompt_config = yaml.safe_load(file)
-
-    # Get the options for the specific entity
-    entity_options = prompt_config.get(message.entity, {}).get('system-intent', {}).get('options', {})
-    print("entity_options", entity_options)
-
-    # Check if entity options are empty or not found
-    if not entity_options:        
-        response = {"options": {"error": "No Action has been configured"}} 
-    else:
-        # Prepare the response as a key-value pair
-        response = {
-            "options": {key: value for key, value in entity_options.items()}
-        } 
-
-    return {"response": response}
-
-def handlemessage(message:Message):
+async def handlemessage(message: Message) -> Dict[str, Any]:
     print("Inside handlemessage")
-    print('message',message)
+    print('message', message)
     global prompt_config
     global action_config
     patient_data = []
@@ -53,57 +26,100 @@ def handlemessage(message:Message):
 
     prompt_config = getConfig(prompts_file)
     action_config = getConfig(action_file)
-    if(message.intent == "system-intent" and message.message == "auto_populate"):
+
+    # Check if the message contains "@Job aid"
+    job_aid_match = re.search(r'@Job aid:\s*(.*)', message.message)
+    web_search_match = re.search(r'@web:\s*(.*)', message.message)
+    if job_aid_match:
+        user_question = job_aid_match.group(1).strip()
+        return await call_job_aid_api(user_question)
+    elif web_search_match:
+        user_question = web_search_match.group(1).strip()
+        message.message = user_question
+        message.intent = "user-intent"
+
+
+    if message.intent == "system-intent" and message.message == "auto_populate":
         patient_data = get_patient_data(message)
-    elif(message.intent == "system-intent" and message.entity == "memberlist_page"):
+    elif message.intent == "system-intent" and message.entity == "memberlist_page":
         patient_data = get_All_patient_summary(message.patient_ids)
     else:
         patient_data = get_Patient_Summary('1')
 
     response = runner(message, patient_data)
-    print("response", response)
+    print("response", response)  
 
-    #print("\n shared_data_instance", shared_data_instance.get_data('auto_populate'))
-
-    # Check if the response contains HTML
     if re.search(r'<[^>]+>', response):
-        return {"response": {"html": response}}
+        return {"html": response}
     elif message.message == "auto_populate" or shared_data_instance.get_data('auto_populate') == 'auto_populate':
-        return {"response": {"auto_populate": response}}
+        return {"auto_populate": response}
     else:
-        #return {"response": {"html": response}}
-        return {"response": response}
+        return response
+
+async def call_job_aid_api(user_question: str) -> Dict[str, Any]:
+    endpoint = "http://127.0.0.1:8001/chat"
+    headers = {
+        "Content-Type": "application/json",
+        "userId": "mandar.bhumkar@gmail.com"
+    } 
+    data = {
+        "msg": user_question
+    }
+ 
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(endpoint, headers=headers, json=data) as response:
+            if response.status == 200:
+                api_response = await response.json()
+                return api_response
+            else:
+                error_message = f"Error calling Job Aid API: {response.status}"
+                return  error_message
+
+def handle_config(message: Message) -> Dict[str, Any]:
+    print("Inside handle_config")
+    print('message', message)
+
+    with open('config/action.yaml', 'r') as file:
+        prompt_config = yaml.safe_load(file)
+
+    entity_options = prompt_config.get(message.entity, {}).get('system-intent', {}).get('options', {})
+    print("entity_options", entity_options)
+
+    if not entity_options:
+        response = {"options": {"error": "No Action has been configured"}}
+    else:
+        response = {
+            "options": {key: value for key, value in entity_options.items()}
+        }
+
+    return response
 
 def get_patient_data(message):
-    value = []  # Changed to a list to store multiple function results
+    value = []
     functions = action_config[message.entity][message.intent]["functions"]
-    #print("functions", functions)
     for function in functions:
         result = globals()[function]("1")
-        #print("result", result)
-        value.append(result)  # Append each function result to the value list
+        value.append(result)
     return value
-
 
 def runner(message, patient_data):
     print("Inside runner")
-    user_prompt, system_prompt = create_prompt(message,patient_data)
+    user_prompt, system_prompt = create_prompt(message, patient_data)
     client = init_AI_client(message.family)
 
-    if(message.intent == "user-intent"):
+    if message.intent == "user-intent":
         functions = action_config[message.entity]['user-intent']["functions"]
         print("functions", functions)
         return chat(system_prompt, user_prompt, functions, message.model)
     else:
-        return  generate(client,message.model, user_prompt, system_prompt)
-    
+        return generate(client, message.model, user_prompt, system_prompt)
 
-def create_prompt(message,patient_data):
+def create_prompt(message, patient_data):
     print("Inside create_prompt")
-    #print("2. prompt_config", prompt_config)
     system_prompt = prompt_config["system_prompt"]
 
-    if(message.intent == "system-intent"):
+    if message.intent == "system-intent":
         user_prompt = prompt_config["user_prompt"][message.entity][message.intent][message.message]['input']
     else:
         user_prompt = prompt_config["user_prompt"][message.entity][message.intent]['general']['input']
@@ -128,9 +144,7 @@ def create_prompt(message,patient_data):
     print("\n system_prompt", system_prompt)
     return user_prompt, system_prompt
 
-
 def init_AI_client(model_family):    
-    
     config = getConfig(config_file)   
     key = config[model_family]["key"]
     base_url = config[model_family]["url"]
@@ -143,8 +157,7 @@ def init_AI_client(model_family):
         base_url = base_url
     )    
 
-
-def generate(client,model,user_prompt, system_prompt):        
+def generate(client, model, user_prompt, system_prompt):        
     num_tokens_from_string(''.join([system_prompt, user_prompt]), default_encoding, "input")
     
     chat_completion = client.chat.completions.create(

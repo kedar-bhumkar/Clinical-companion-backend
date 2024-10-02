@@ -19,8 +19,12 @@ user_prompt :
           rules: "The rules for the next best action are as follows: Check the patients upcoming appointments. If the patient has a upcoming  Vaccination appointment  inform the clinican to Labs by placing a lab order.
                   If the patient has a upcoming Annual Physical appointment in next 7 days, inform the clinician to complete consent form for a Telehealth visit. "                
     user-intent:
-      patient_summary:
-          input: "Summarize the below patient data focussing on key details {patient_data}. Provide the summary in the below  structured format. {format}"
+        general:
+          input: "Based on the below inputs :  'patient data' and 'mapping rules', please answer the 'user's question' .    
+                  inputs -  'patient data' - {patient_data}, 'mapping rules' - {rules}. 'users question' - {question}. Provide the output in the below format {format} "
+          output: "Use the information in the 'patient data' to return the response in html. Note: Always use html tags to  format this data. Use div tags at the top.  Instead of h2 use h3 tags. Add a class 'llm-h3' to the h3 tags. Make it visually appealing. Do not use html tags in the div tags"
+          rules: "If the user's question is about populating the form reply by saying that it is is not supported and offer to help on another question. For all other questions use the information in the 'patient    
+                data' to return the response in a concise manner" 
 
   landing_page:
     system-intent:
@@ -33,8 +37,7 @@ user_prompt :
       next_best_action:
           input: "Based on the below patient data Patient Data: {patient_data} and  Rules: {rules}. , provide the next best action for the patient in the below format. Format:{format}"
           output: "Provide details in a concise manner addressing the clinician directly in first person. Do not add any salutation or greetings or thank you notes. Always use html tags to  format this data. Use div tags at the top. Instead of h2 use h3 tags. Add a class 'llm-h3' to the h3 tags. Make it visually appealing. Do not use html tags in the div tags"
-          rules: "The rules for the next best action are as follows: Check the patients upcoming appointments. If the patient has a upcoming  Vaccination appointment  inform the clinican to Labs by placing a lab order.
-                  If the patient has a upcoming Annual Physical appointment in next 7 days, inform the clinician to complete consent form for a Telehealth visit. "          
+          rules: "The rules for the next best action are as follows: Check the patients upcoming appointments. If the patient has a upcoming  Vaccination appointment  inform the clinican to Labs by placing a lab order.                  If the patient has a upcoming Annual Physical appointment in next 7 days, inform the clinician to complete consent form for a Telehealth visit. "          
       auto_populate:
           input: "Based on the below 'form data', 'patient data' and mapping rules {rules}, initialize the form with values from the patient 
                   data. 'form data' -  {form_data} , 'patient data' - {patient_data}, mapping rules - {rules}. "
@@ -45,8 +48,12 @@ user_prompt :
           input: "Based on the below patient data, provide the insights for the patient. {patient_data}. Provide the insights in the below  
               structured format. {format}"
     user-intent:
-      patient_summary:
-          input: "Summarize the below patient data focussing on key details {patient_data}. Provide the summary in the below  structured format. {format}"
+        general:
+          input: "Based on the below inputs :  'patient data' and 'mapping rules', please answer the 'user's question' .    
+                  inputs -  'patient data' - {patient_data}, 'mapping rules' - {rules}. 'users question' - {question}. Provide the output in the below format {format} "
+          output: "Use the information in the 'patient data' to return the response in html. Note: Always use html tags to  format this data. Use div tags at the top.  Instead of h2 use h3 tags. Add a class 'llm-h3' to the h3 tags. Make it visually appealing. Do not use html tags in the div tags. If the web_search function is called, provide the response by summarizing the returned results."
+          rules: "If the user's question is about populating the form reply by saying that it is is not supported and offer to help on another question. For all other questions use the information in the 'patient    
+                data' to return the response in a concise manner. If you cannot find the answer in the patient data, call the web_search function and pass the question as the parameter. Do not make up  values or hallucinate. Leave the response as  blank if you cannot find the value in the function response."        
   order_page:
     system-intent:
       auto_populate:
@@ -59,8 +66,12 @@ user_prompt :
           input: "Based on the below patient data, provide the insights for the patient. {patient_data}. Provide the insights in the below  
                   structured format. {format}"
     user-intent:
-      patient_summary:
-          input: "Summarize the below patient data focussing on key details {patient_data}. Provide the summary in the below  structured format. {format}"
+        general:
+          input: "Based on the below inputs :  'patient data' and 'mapping rules', please answer the 'user's question' .    
+                  inputs -  'patient data' - {patient_data}, 'mapping rules' - {rules}. 'users question' - {question}. Provide the output in the below format {format} "
+          output: "Use the information in the 'patient data' to return the response in html. Note: Always use html tags to  format this data. Use div tags at the top.  Instead of h2 use h3 tags. Add a class 'llm-h3' to the h3 tags. Make it visually appealing. Do not use html tags in the div tags"
+          rules: "If the user's question is about populating the form reply by saying that it is is not supported and offer to help on another question. For all other questions use the information in the 'patient    
+                data' to return the response in a concise manner"      
   consent_page:
     system-intent:
       auto_populate:
