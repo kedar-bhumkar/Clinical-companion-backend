@@ -5,6 +5,7 @@ import re
 from difflib import *
 import tiktoken
 from pydantic_models import *
+from typing import Dict, Any, Optional
 
 import re
 from datetime import datetime, timedelta
@@ -35,3 +36,21 @@ def num_tokens_from_string(string: str, encoding_name: str, type: str) -> int:
     num_tokens = len(encoding.encode(string))
     print(f'For {type} the no of tokens are {num_tokens}')
     return num_tokens
+
+def get_nested_value(config: Dict[str, Any], keys: list) -> Optional[Any]:
+    """
+    Safely retrieve a nested value from a dictionary.
+    
+    Args:
+        config (Dict[str, Any]): The configuration dictionary.
+        keys (list): A list of keys representing the path to the desired value.
+    
+    Returns:
+        Optional[Any]: The value if found, None otherwise.
+    """
+    for key in keys:
+        if isinstance(config, dict) and key in config:
+            config = config[key]
+        else:
+            return None
+    return config

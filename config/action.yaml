@@ -1,4 +1,5 @@
 memberlist_page:
+    base-function: get_All_patient_summary
     system-intent:
         functions: 
           - get_All_patient_summary
@@ -10,6 +11,7 @@ memberlist_page:
           - web_search
 
 landing_page:
+    base-function: get_Patient_Summary
     system-intent:
         functions: 
           - get_Patient_Summary
@@ -23,9 +25,11 @@ landing_page:
           - web_search
 
 order_page:
+    base-function: get_Patient_Summary
     system-intent:
-        functions: 
-          - get_patient
+        auto_populate:
+            functions: 
+              - get_Patient_Summary
         options:            
             next_best_action: Next Best Action
             auto_populate: Auto Populate
@@ -35,10 +39,12 @@ order_page:
         - web_search
         
 consent_page:
+    base-function: get_Patient_Summary
     system-intent:
-        functions:           
-          - get_advanced_care_plan
-          - get_Responsible_party
+        auto_populate:
+            functions:           
+              - get_advanced_care_plan
+              - get_Responsible_party
         options:            
             auto_populate: Auto Populate
             insights: Insights            

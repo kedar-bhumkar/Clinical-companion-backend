@@ -36,7 +36,7 @@ def get_patient_immunizations(patient_id: str) -> List[Dict[str, Any]]:
     return getPatientImmunizations(patient_id)
 
 def get_patient_lab_results(patient_id: str) -> List[Dict[str, Any]]:
-    return getPatientLabResults(patient_id)
+    return getPatientLabResults(patient_id) 
 
 def get_patient_procedures(patient_id: str) -> List[Dict[str, Any]]:
     return getPatientProcedures(patient_id)

@@ -10,7 +10,7 @@ from mock_data import *
 from typing import Dict, Any
 from bot_agent_with_memory_api_ready import chat
 from shared import shared_data_instance
-import aiohttp
+from web_service import call_job_aid_api
 
 prompt_config = {}
 action_config = {}
@@ -39,12 +39,20 @@ async def handlemessage(message: Message) -> Dict[str, Any]:
         message.intent = "user-intent"
 
 
-    if message.intent == "system-intent" and message.message == "auto_populate":
-        patient_data = get_patient_data(message)
-    elif message.intent == "system-intent" and message.entity == "memberlist_page":
-        patient_data = get_All_patient_summary(message.patient_ids)
-    else:
-        patient_data = get_Patient_Summary('1')
+    value = [] 
+    functions = get_nested_value(action_config, [message.entity, message.intent, message.message, "functions"])
+    print("functions", functions)
+    if functions is None:    
+        base_function = get_nested_value(action_config, [message.entity, "base-function"])
+        functions = [base_function] if base_function else []
+        print("base-functions", functions)    
+    
+    for function in functions:
+        result = globals()[function](message.patient_ids)
+        value.append(result)
+
+    patient_data = value
+
 
     response = runner(message, patient_data)
     print("response", response)  
@@ -56,25 +64,6 @@ async def handlemessage(message: Message) -> Dict[str, Any]:
     else:
         return response
 
-async def call_job_aid_api(user_question: str) -> Dict[str, Any]:
-    endpoint = "http://127.0.0.1:8001/chat"
-    headers = {
-        "Content-Type": "application/json",
-        "userId": "mandar.bhumkar@gmail.com"
-    } 
-    data = {
-        "msg": user_question
-    }
- 
-
-    async with aiohttp.ClientSession() as session:
-        async with session.post(endpoint, headers=headers, json=data) as response:
-            if response.status == 200:
-                api_response = await response.json()
-                return api_response
-            else:
-                error_message = f"Error calling Job Aid API: {response.status}"
-                return  error_message
 
 def handle_config(message: Message) -> Dict[str, Any]:
     print("Inside handle_config")
@@ -94,14 +83,6 @@ def handle_config(message: Message) -> Dict[str, Any]:
         }
 
     return response
-
-def get_patient_data(message):
-    value = []
-    functions = action_config[message.entity][message.intent]["functions"]
-    for function in functions:
-        result = globals()[function]("1")
-        value.append(result)
-    return value
 
 def runner(message, patient_data):
     print("Inside runner")

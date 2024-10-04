@@ -21,7 +21,7 @@ class Message(BaseModel):
     intent: Optional[str] = Field(None, description="The intent of the message.")
     entity: Optional[str] = Field(None, description="The entity of the message.")
     patient_id: Optional[str] = Field(None, description="The patient id of the message.")
-    patient_ids: Optional[list[str]] = Field(None, description="The patient ids of the message.")
+    patient_ids: Optional[list[str]] = Field(["1"], description="The patient ids of the message.")
     form_data: Optional[str] = Field(None, description="The form data of the message used in auto complete.")
 
 
